@@ -4,8 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>LLM Token Counter - Dark Mode</title>
-    <link rel="stylesheet" href="/static/css/style.css" type="text/css">
-    <link rel="stylesheet" href="/static/css/test.css" type="text/css">
+    <style>
+        {% include 'style.css' %}
+    </style>
 </head>
 <body>
     <div class="container">
@@ -43,6 +44,83 @@
         </div>
     </div>
     
-    <script src="/static/js/script.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const modelSelect = document.getElementById('model-select');
+            const textInput = document.getElementById('text-input');
+            const calculateBtn = document.getElementById('calculate-btn');
+            const tokenCount = document.getElementById('token-count');
+            const tokenList = document.getElementById('token-list');
+            const results = document.getElementById('results');
+            const loading = document.getElementById('loading');
+            
+            calculateBtn.addEventListener('click', function() {
+                const modelId = modelSelect.value;
+                const text = textInput.value.trim();
+                
+                if (!text) {
+                    alert('Please enter some text to tokenize');
+                    return;
+                }
+                
+                // Show loading spinner
+                loading.style.display = 'block';
+                results.style.display = 'none';
+                
+                // Clear previous results
+                tokenCount.textContent = '0';
+                tokenList.innerHTML = '';
+                
+                // Make API request
+                fetch('/count_tokens', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        model_id: modelId,
+                        text: text
+                    }),
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    // Update token count
+                    tokenCount.textContent = data.count;
+                    
+                    // Add approximation note if needed
+                    if (data.is_approximation) {
+                        const note = document.createElement('div');
+                        note.className = 'approximation-note';
+                        note.textContent = 'Note: This is an approximation. The actual token count may vary slightly.';
+                        tokenList.appendChild(note);
+                    }
+                    
+                    // Add individual tokens
+                    data.tokens.forEach(token => {
+                        const tokenElement = document.createElement('div');
+                        tokenElement.className = 'token';
+                        tokenElement.textContent = token;
+                        tokenList.appendChild(tokenElement);
+                    });
+                    
+                    // Show results
+                    results.style.display = 'block';
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Error calculating tokens: ' + error.message);
+                })
+                .finally(() => {
+                    // Hide loading spinner
+                    loading.style.display = 'none';
+                });
+            });
+        });
+    </script>
 </body>
 </html>
