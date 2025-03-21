@@ -9,6 +9,8 @@ tokenizers = {}
 
 # List of available models with their display names
 AVAILABLE_MODELS = [
+    {"id": "Qwen/Qwen2.5-Coder-32B-Instruct", "name": "Qwen2.5-Coder-32B"},
+    {"id": "microsoft/phi-4", "name": "Phi-4"},
     {"id": "gpt2", "name": "GPT-2"},
     {"id": "facebook/opt-350m", "name": "OPT-350M"},
     {"id": "EleutherAI/gpt-neo-125m", "name": "GPT-Neo-125M"},
