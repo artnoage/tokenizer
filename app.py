@@ -131,7 +131,7 @@ if __name__ == '__main__':
                 return self.application
 
         options = {
-            'bind': '0.0.0.0:8003',
+            'bind': '127.0.0.1:8003',
             'workers': 4,
         }
         print("Starting production server with Gunicorn...")
