@@ -1,9 +1,7 @@
 from flask import Flask, render_template, request, jsonify
-from tokenizers import Tokenizer
+from transformers import AutoTokenizer
 import os
-import json
-import re
-from pathlib import Path
+import traceback
 
 app = Flask(__name__)
 
@@ -16,29 +14,17 @@ AVAILABLE_MODELS = [
     {"id": "microsoft/phi-4", "name": "Phi-4"},
 ]
 
-# Simple tokenization methods for demonstration
-def simple_word_tokenize(text):
-    """Simple word tokenizer that splits on whitespace and punctuation"""
-    # Split on whitespace and keep punctuation
-    tokens = re.findall(r'\w+|[^\w\s]', text)
-    return tokens
-
 def get_tokenizer(model_id):
     """Load tokenizer if not already loaded"""
     if model_id not in tokenizers:
         try:
-            # For all models, use simple tokenization as a fallback
-            # In a production app, you would download the actual tokenizers
-            if model_id == "Qwen/Qwen2.5-Coder-32B-Instruct":
-                return {"type": "simple", "name": "Qwen2.5-Coder-32B (Approximation)"}
-            elif model_id == "microsoft/phi-4":
-                return {"type": "simple", "name": "Phi-4 (Approximation)"}
-            else:
-                return {"type": "simple", "name": f"{model_id} (Approximation)"}
+            print(f"Loading tokenizer for {model_id}...")
+            tokenizers[model_id] = AutoTokenizer.from_pretrained(model_id, use_fast=True)
+            print(f"Successfully loaded tokenizer for {model_id}")
         except Exception as e:
             print(f"Error loading tokenizer for {model_id}: {e}")
-            return {"type": "simple", "name": f"{model_id} (Approximation)"}
-    
+            traceback.print_exc()
+            return None
     return tokenizers.get(model_id)
 
 @app.route('/')
@@ -54,20 +40,19 @@ def count_tokens():
     if not model_id or not text:
         return jsonify({"error": "Missing model_id or text"}), 400
     
-    tokenizer_info = get_tokenizer(model_id)
-    if not tokenizer_info:
+    tokenizer = get_tokenizer(model_id)
+    if not tokenizer:
         return jsonify({"error": f"Failed to load tokenizer for {model_id}"}), 500
     
-    # Process based on tokenizer type
-    if tokenizer_info["type"] == "tokenizer":
-        # Use the actual tokenizer
-        encoding = tokenizer_info["tokenizer"].encode(text)
-        tokens = encoding.tokens
-        token_count = len(tokens)
-    else:
-        # Use simple tokenization
-        tokens = simple_word_tokenize(text)
-        token_count = len(tokens)
+    # Tokenize the text
+    encoding = tokenizer.encode(text, add_special_tokens=False)
+    token_count = len(encoding)
+    
+    # Get the actual tokens for display
+    tokens = []
+    for token_id in encoding:
+        token_text = tokenizer.decode([token_id])
+        tokens.append(token_text)
     
     return jsonify({
         "count": token_count,
