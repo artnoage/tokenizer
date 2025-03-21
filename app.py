@@ -11,13 +11,6 @@ tokenizers = {}
 AVAILABLE_MODELS = [
     {"id": "Qwen/Qwen2.5-Coder-32B-Instruct", "name": "Qwen2.5-Coder-32B"},
     {"id": "microsoft/phi-4", "name": "Phi-4"},
-    {"id": "gpt2", "name": "GPT-2"},
-    {"id": "facebook/opt-350m", "name": "OPT-350M"},
-    {"id": "EleutherAI/gpt-neo-125m", "name": "GPT-Neo-125M"},
-    {"id": "google/flan-t5-small", "name": "FLAN-T5-Small"},
-    {"id": "microsoft/phi-1", "name": "Phi-1"},
-    {"id": "mistralai/Mistral-7B-v0.1", "name": "Mistral-7B"},
-    {"id": "meta-llama/Llama-2-7b-hf", "name": "Llama-2-7B"},
 ]
 
 def get_tokenizer(model_id):
