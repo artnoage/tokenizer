@@ -46,7 +46,9 @@ document.addEventListener('DOMContentLoaded', function() {
             data.tokens.forEach(token => {
                 const tokenElement = document.createElement('span');
                 tokenElement.className = 'token';
-                tokenElement.textContent = token;
+                // Replace spaces with visible space character for display
+                const displayToken = token.replace(/ /g, '␣');
+                tokenElement.textContent = displayToken;
                 tokenList.appendChild(tokenElement);
             });
             
