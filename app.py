@@ -1,10 +1,10 @@
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request, jsonify, url_for
 from transformers import AutoTokenizer
 import os
 import traceback
 import tiktoken
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder='static', static_url_path='/static')
 
 # Dictionary to store loaded tokenizers
 tokenizers = {}
