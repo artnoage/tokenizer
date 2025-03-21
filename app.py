@@ -115,10 +115,28 @@ def count_tokens():
 
 if __name__ == '__main__':
     try:
-        from waitress import serve
-        print("Starting production server with Waitress...")
-        serve(app, host="0.0.0.0", port=8003)
+        import gunicorn.app.base
+        
+        class StandaloneApplication(gunicorn.app.base.BaseApplication):
+            def __init__(self, app, options=None):
+                self.options = options or {}
+                self.application = app
+                super().__init__()
+
+            def load_config(self):
+                for key, value in self.options.items():
+                    self.cfg.set(key.lower(), value)
+
+            def load(self):
+                return self.application
+
+        options = {
+            'bind': '0.0.0.0:8003',
+            'workers': 4,
+        }
+        print("Starting production server with Gunicorn...")
+        StandaloneApplication(app, options).run()
     except ImportError:
-        print("Waitress not found. Starting development server...")
-        print("WARNING: For production use, install waitress: pip install waitress")
+        print("Gunicorn not found. Starting development server...")
+        print("WARNING: For production use, install gunicorn: pip install gunicorn")
         app.run(debug=True)
