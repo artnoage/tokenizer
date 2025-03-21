@@ -129,6 +129,17 @@ button:hover {
     color: #03dac6;
 }
 
+.approximation-note {
+    margin-bottom: 10px;
+    padding: 8px;
+    background-color: #332940;
+    border-radius: 4px;
+    border-left: 4px solid #ff7597;
+    color: #e0e0e0;
+    font-size: 14px;
+    width: 100%;
+}
+
 .loading {
     display: none;
     text-align: center;

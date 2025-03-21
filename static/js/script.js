@@ -43,6 +43,16 @@ document.addEventListener('DOMContentLoaded', function() {
             
             // Display token breakdown
             tokenList.innerHTML = '';
+            
+            // Add approximation note if needed
+            if (data.is_approximation) {
+                const noteElement = document.createElement('div');
+                noteElement.className = 'approximation-note';
+                noteElement.textContent = 'Note: This is an approximation as the exact tokenizer is not publicly available.';
+                tokenList.appendChild(noteElement);
+            }
+            
+            // Add tokens
             data.tokens.forEach(token => {
                 const tokenElement = document.createElement('span');
                 tokenElement.className = 'token';
