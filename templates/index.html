@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LLM Token Counter</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>LLM Token Counter</h1>
+        
+        <div class="model-selector">
+            <label for="model-select">Select LLM Model:</label>
+            <select id="model-select">
+                {% for model in models %}
+                <option value="{{ model.id }}">{{ model.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        
+        <div class="input-container">
+            <label for="text-input">Enter your text:</label>
+            <textarea id="text-input" placeholder="Type or paste your text here..."></textarea>
+        </div>
+        
+        <button id="calculate-btn">Calculate Tokens</button>
+        
+        <div class="results" id="results">
+            <div class="token-count">
+                <h2>Token Count: <span id="token-count">0</span></h2>
+            </div>
+            <div class="token-details">
+                <h3>Token Breakdown:</h3>
+                <div id="token-list"></div>
+            </div>
+        </div>
+        
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <p>Loading tokenizer...</p>
+        </div>
+    </div>
+    
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html>
