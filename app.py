@@ -12,8 +12,8 @@ tokenizers = {}
 
 # List of available models with their display names
 AVAILABLE_MODELS = [
-    {"id": "gpt2", "name": "GPT-2"},
-    {"id": "cl100k_base", "name": "OpenAI cl100k (GPT-3.5/4)"},
+    {"id": "Qwen/Qwen2.5-Coder-32B-Instruct", "name": "Qwen2.5-Coder-32B"},
+    {"id": "microsoft/phi-4", "name": "Phi-4"},
 ]
 
 # Simple tokenization methods for demonstration
@@ -27,29 +27,17 @@ def get_tokenizer(model_id):
     """Load tokenizer if not already loaded"""
     if model_id not in tokenizers:
         try:
-            if model_id == "gpt2":
-                # Use a pre-trained tokenizer if available locally
-                cache_dir = Path.home() / ".cache" / "huggingface" / "tokenizers"
-                cache_dir.mkdir(parents=True, exist_ok=True)
-                tokenizer_path = cache_dir / "gpt2.json"
-                
-                if not tokenizer_path.exists():
-                    # If not available, use simple tokenization
-                    return {"type": "simple", "name": "GPT-2 (Simple Approximation)"}
-                
-                tokenizers[model_id] = {
-                    "type": "tokenizer",
-                    "tokenizer": Tokenizer.from_file(str(tokenizer_path)),
-                    "name": "GPT-2"
-                }
-            elif model_id == "cl100k_base":
-                # Simple approximation for cl100k
-                return {"type": "simple", "name": "OpenAI cl100k (Simple Approximation)"}
+            # For all models, use simple tokenization as a fallback
+            # In a production app, you would download the actual tokenizers
+            if model_id == "Qwen/Qwen2.5-Coder-32B-Instruct":
+                return {"type": "simple", "name": "Qwen2.5-Coder-32B (Approximation)"}
+            elif model_id == "microsoft/phi-4":
+                return {"type": "simple", "name": "Phi-4 (Approximation)"}
             else:
-                return None
+                return {"type": "simple", "name": f"{model_id} (Approximation)"}
         except Exception as e:
             print(f"Error loading tokenizer for {model_id}: {e}")
-            return {"type": "simple", "name": f"{model_id} (Simple Approximation)"}
+            return {"type": "simple", "name": f"{model_id} (Approximation)"}
     
     return tokenizers.get(model_id)
 
