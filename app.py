@@ -117,7 +117,7 @@ if __name__ == '__main__':
     try:
         from waitress import serve
         print("Starting production server with Waitress...")
-        serve(app, host="127.0.0.1", port=5000)
+        serve(app, host="0.0.0.0", port=8003)
     except ImportError:
         print("Waitress not found. Starting development server...")
         print("WARNING: For production use, install waitress: pip install waitress")
