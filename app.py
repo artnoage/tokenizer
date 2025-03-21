@@ -2,6 +2,7 @@ from flask import Flask, render_template, request, jsonify
 from transformers import AutoTokenizer
 import os
 import traceback
+import tiktoken
 
 app = Flask(__name__)
 
@@ -25,10 +26,21 @@ def get_tokenizer(model_id):
         try:
             # Handle special cases for non-HF models
             if model_id.startswith("gpt-"):
-                # OpenAI models use cl100k_base tokenizer (for GPT-3.5/4)
-                print(f"Loading cl100k tokenizer for OpenAI model {model_id}...")
-                tokenizers[model_id] = AutoTokenizer.from_pretrained("openai/clip-vit-large-patch14")
-                print(f"Successfully loaded tokenizer for {model_id}")
+                # OpenAI models use tiktoken for accurate tokenization
+                print(f"Loading tiktoken for OpenAI model {model_id}...")
+                if model_id.startswith("gpt-4"):
+                    encoding_name = "cl100k_base"  # GPT-4 uses cl100k_base encoding
+                elif model_id.startswith("gpt-3.5"):
+                    encoding_name = "cl100k_base"  # GPT-3.5-turbo also uses cl100k_base
+                else:
+                    encoding_name = "p50k_base"    # Default for older models
+                
+                tokenizers[model_id] = {
+                    "type": "tiktoken",
+                    "encoding": tiktoken.get_encoding(encoding_name),
+                    "name": model_id
+                }
+                print(f"Successfully loaded tiktoken for {model_id}")
             elif model_id.startswith("claude-"):
                 # Claude models use similar tokenization to Llama 2
                 print(f"Loading tokenizer for Anthropic model {model_id}...")
@@ -62,18 +74,38 @@ def count_tokens():
     if not tokenizer:
         return jsonify({"error": f"Failed to load tokenizer for {model_id}"}), 500
     
-    # Tokenize the text
-    encoding = tokenizer.encode(text, add_special_tokens=False)
-    token_count = len(encoding)
-    
-    # Get the actual tokens for display
-    tokens = []
-    for token_id in encoding:
-        token_text = tokenizer.decode([token_id])
-        tokens.append(token_text)
-    
-    # Add note for approximated tokenizers
-    is_approximation = model_id.startswith(("gpt-", "claude-"))
+    # Process based on tokenizer type
+    if isinstance(tokenizer, dict) and tokenizer.get("type") == "tiktoken":
+        # Use tiktoken for OpenAI models
+        encoding = tokenizer["encoding"]
+        token_ids = encoding.encode(text)
+        token_count = len(token_ids)
+        
+        # Get the actual tokens for display
+        tokens = []
+        for token_id in token_ids:
+            token_bytes = encoding.decode_single_token_bytes(token_id)
+            try:
+                token_text = token_bytes.decode('utf-8')
+            except UnicodeDecodeError:
+                token_text = repr(token_bytes)[2:-1]  # Remove b' and ' from repr
+            tokens.append(token_text)
+        
+        # Not an approximation since we're using the official tokenizer
+        is_approximation = False
+    else:
+        # Use transformers tokenizer
+        encoding = tokenizer.encode(text, add_special_tokens=False)
+        token_count = len(encoding)
+        
+        # Get the actual tokens for display
+        tokens = []
+        for token_id in encoding:
+            token_text = tokenizer.decode([token_id])
+            tokens.append(token_text)
+        
+        # Only Claude is an approximation now
+        is_approximation = model_id.startswith("claude-")
     
     return jsonify({
         "count": token_count,
