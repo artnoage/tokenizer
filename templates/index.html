@@ -72,6 +72,10 @@
                 tokenList.innerHTML = '';
                 
                 // Make API request
+                console.log('Sending request to count tokens...');
+                console.log('Model ID:', modelId);
+                console.log('Text length:', text.length);
+                
                 fetch('/count_tokens', {
                     method: 'POST',
                     headers: {
@@ -81,6 +85,7 @@
                         model_id: modelId,
                         text: text
                     }),
+                    credentials: 'same-origin'
                 })
                 .then(response => {
                     if (!response.ok) {
@@ -113,7 +118,19 @@
                 })
                 .catch(error => {
                     console.error('Error:', error);
-                    alert('Error calculating tokens: ' + error.message);
+                    // More detailed error reporting
+                    alert('Error calculating tokens: ' + error.message + 
+                          '\n\nPlease check the browser console for more details.');
+                    
+                    // Try a test GET request to see if the endpoint is reachable
+                    console.log('Attempting test GET request to /count_tokens...');
+                    fetch('/count_tokens', {method: 'GET'})
+                        .then(response => {
+                            console.log('Test GET response status:', response.status);
+                            return response.text();
+                        })
+                        .then(text => console.log('Test GET response:', text))
+                        .catch(err => console.error('Test GET also failed:', err));
                 })
                 .finally(() => {
                     // Hide loading spinner

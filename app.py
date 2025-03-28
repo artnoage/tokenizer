@@ -62,9 +62,20 @@ def get_tokenizer(model_id):
 def index():
     return render_template('index.html', models=AVAILABLE_MODELS)
 
-@app.route('/count_tokens', methods=['POST'])
+@app.route('/count_tokens', methods=['POST', 'GET'])  # Allow both POST and GET for debugging
 def count_tokens():
+    # Add debugging information
+    print(f"Request method: {request.method}")
+    print(f"Request headers: {request.headers}")
+    
+    # Handle both GET and POST for testing
+    if request.method == 'GET':
+        return jsonify({"status": "Token counting endpoint is working. Use POST for actual counting."}), 200
+    
+    # Process POST request
     data = request.json
+    print(f"Received data: {data}")
+    
     model_id = data.get('model_id')
     text = data.get('text', '')
     
