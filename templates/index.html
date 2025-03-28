@@ -76,7 +76,12 @@
                 console.log('Model ID:', modelId);
                 console.log('Text length:', text.length);
                 
-                fetch('/count_tokens', {
+                // Get the base URL from the current page
+                const baseUrl = window.location.pathname.endsWith('/') 
+                    ? window.location.pathname 
+                    : window.location.pathname + '/';
+                
+                fetch(baseUrl + 'count_tokens', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -123,8 +128,11 @@
                           '\n\nPlease check the browser console for more details.');
                     
                     // Try a test GET request to see if the endpoint is reachable
-                    console.log('Attempting test GET request to /count_tokens...');
-                    fetch('/count_tokens', {method: 'GET'})
+                    const baseUrl = window.location.pathname.endsWith('/') 
+                        ? window.location.pathname 
+                        : window.location.pathname + '/';
+                    console.log('Attempting test GET request to ' + baseUrl + 'count_tokens...');
+                    fetch(baseUrl + 'count_tokens', {method: 'GET'})
                         .then(response => {
                             console.log('Test GET response status:', response.status);
                             return response.text();

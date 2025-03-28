@@ -58,10 +58,17 @@ def get_tokenizer(model_id):
             return None
     return tokenizers.get(model_id)
 
+# Configure Flask for subdirectory deployment if needed
+# This helps when the app is not deployed at the root of the domain
+app.config['APPLICATION_ROOT'] = '/'
+app.config['PREFERRED_URL_SCHEME'] = 'https'
+
 @app.route('/')
 def index():
     return render_template('index.html', models=AVAILABLE_MODELS)
 
+# Make sure routes work regardless of trailing slash
+@app.route('/count_tokens/', methods=['POST', 'GET'])
 @app.route('/count_tokens', methods=['POST', 'GET'])  # Allow both POST and GET for debugging
 def count_tokens():
     # Add debugging information
