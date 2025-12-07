@@ -1,0 +1,15 @@
+[project]
+name = "tokenizer"
+version = "1.0.0"
+description = "Token counting tool for AI prompts"
+requires-python = ">=3.10"
+dependencies = [
+    "flask>=2.3.3",
+    "transformers>=4.38.2",
+    "tiktoken>=0.5.2",
+    "waitress>=2.1.2",
+    "gunicorn>=21.0.0",
+]
+
+[tool.uv]
+dev-dependencies = []

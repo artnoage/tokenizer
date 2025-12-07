@@ -1,4 +1,0 @@
-flask==2.3.3
-transformers==4.38.2
-tiktoken==0.5.2
-waitress==2.1.2
